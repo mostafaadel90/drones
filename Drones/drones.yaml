@@ -1,0 +1,204 @@
+openapi: 3.0.1
+info:
+  title: Drones service
+  version: 1.0.0
+  description: |
+    The service is used to manage drones.
+
+
+tags:
+  - name: drone
+  - name: Medication
+paths:
+  /drone/{serialNumber}:
+    get:
+      tags:
+        - drone
+      summary: Return a drone details By Serial Number.
+      description: |
+       Return a drone details By Serial Number 
+      operationId: getDroneBySerialNumber
+      parameters:
+        - in: path
+          required: true
+          name: serialNumber
+          schema:
+            type: string
+          description: |
+            A uniqe serial number for a each drone
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/Drone'  
+                
+  /drone/batteryLevel/{serialNumber}:
+    get:
+      tags:
+        - drone
+      summary: Return a drone battery level.
+      description: |
+       Return a drone battery level.
+      operationId: getBatteryLevelByDroneSerialNumber
+      parameters:
+        - in: path
+          required: true
+          name: serialNumber
+          schema:
+            type: string
+          description: |
+            A uniqe serial number for a each drone
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json;charset=utf-8:
+              schema:
+                type: integer   
+                
+  /drone/state/idle:
+    get:
+      tags:
+        - drone
+      summary: Return a drones ready for loading.
+      description: |
+       Return a drones ready for loading.
+      operationId: getDronesForLoading
+
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json;charset=utf-8:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Drone'  
+  /drone:
+    post:
+      tags:
+        - drone
+      summary: Create New Drone.
+      description: |
+       Create New Drone.
+      operationId: postDrone
+      requestBody:
+        description: request contain the clear captcha code that inserted form the customer
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Drone'
+      responses:
+        '201':
+          description: Created
+          
+
+  /medication/drone/{droneSerialNumber}:
+    get:
+      tags:
+        - Medication
+      summary: Return list of loaded medications by drone serial number.
+      description: |
+       Return a drone details By Serial Number 
+      operationId: getMedicationListByDrone
+      parameters:
+        - in: path
+          name: droneSerialNumber
+          required: true
+          schema:
+            type: string
+          description: |
+            A uniqe serial number for a each drone
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json;charset=utf-8:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Medication'
+
+components:
+  schemas:
+    Drone:
+      description: |
+        Drone dto contain all drone details
+      type: object
+      required:
+        - serialNumber
+        - model
+        - weight
+        - batteryCapacity
+        - state
+      properties:
+        serialNumber:
+          description: |
+            uniqe serial number for every drone
+          type: string
+        model:
+          description: |
+            model of the drone
+          type: string
+          enum:
+          - Lightweight
+          - Middleweight
+          - Cruiserweight
+          - Heavyweight
+        weight:
+          description: |
+            weight of the drone
+          type: integer
+          maximum: 500
+          minimum: 10
+        batteryCapacity:
+          description: |
+            battery capacity of the drone (percentage)
+          type: integer
+          maximum: 100
+          minimum: 1
+        state:
+          description: |
+            state of the drone
+          type: string
+          enum:
+          - IDLE
+          - LOADING
+          - LOADED
+          - DELIVERING
+          - DELIVERED
+          - RETURNING
+        medications:
+          description: |
+            List of the Medication items
+          type: array
+          items:
+            $ref: '#/components/schemas/Medication'
+    Medication:
+      type: object
+      required:
+        - name
+        - weight
+        - code
+        - image
+      properties:
+        name:
+          description: |
+            medication name
+          type: string
+        weight:
+          description: |
+            medication weight
+          type: integer
+        code:
+          description: |
+            medication code
+          type: string
+        image:
+          description: |
+            medication image
+          type: string
+          format: bayte
